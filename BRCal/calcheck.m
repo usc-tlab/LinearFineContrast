@@ -5,6 +5,8 @@ function [slope_intercept, rmsError]=calcheck(scrnum,bgentry,imsz,stimc,clut,BRc
 % Bgentry (background graylevel) and imsz (image size) should be as close
 % to the experimental condition as possible.
 
+% 11/15: BT changed 'screen' to 'Screen' to conform with Matlab 2013+
+
 clutrng = stimc.clutRng;
 cstep = stimc.step;
 % plot the current clut setting
@@ -49,23 +51,23 @@ drawnow
 % measure screen luminance
 mnE = clutrng(1);
 mxE = clutrng(2);
-win = screen(scrnum,'openwindow',bgentry);
-screen(win,'setclut',clut);
+win = Screen(scrnum,'openwindow',bgentry);
+Screen(win,'setclut',clut);
 E = round(mnE:(mxE-mnE)/4:mxE);
 L = [];
-rect = screen(scrnum,'rect');
+rect = Screen(scrnum,'rect');
 rect(1:2) = rect(3:4)-[300, 120];
-diag = screen(scrnum,'openwindow',bgentry,rect);
-screen(diag,'setclut',clut);
+diag = Screen(scrnum,'openwindow',bgentry,rect);
+Screen(diag,'setclut',clut);
 for x = E,
 	im = ones(imsz)*x;
 	im(:,1) = mxE; im(:,end)=mxE; im(1,:)=mxE; im(end,:)=mxE;
 	sysbeep;
-	screen(win,'putimage',im);
-	L(end+1) = screen(diag,'dialog','Luminance measured',9999);
+	Screen(win,'putimage',im);
+	L(end+1) = Screen(diag,'dialog','Luminance measured',9999);
 end
-screen(diag,'close');
-screen(win,'close');
+Screen(diag,'close');
+Screen(win,'close');
 E1 = [E; ones(size(E))];
 slope_intercept = L/E1;
 Lest = slope_intercept*E1;

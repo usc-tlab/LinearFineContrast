@@ -1,10 +1,14 @@
 % A demo code for using the "BRCal" gamma linearization routines with
 % much-larger-than-256-grey-level-per-image support
 %
-% Credits: The visual calibration routine "BRCalibrator.m" is from Dr. Zhong-Lin Lu
+% History: The visual calibration routine "BRCalibrator.m" is from Dr. Zhong-Lin Lu
 %          For the rest, blame Dr. Bosco Tjan (btjan@usc.edu), 10/2001
+% 11/15: BT changed 'screen' to 'Screen' to conform with Matlab 2013+
+%
 
 clear all
+Screen('Preference', 'SkipSyncTests', 1);
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % add path if the this m-file is at the same level as the BRCal folder
@@ -84,11 +88,11 @@ end
 % Your mileage with earlier version of PsychToolbox may vary.
 
 %%%% Initialize a window
-win = screen('OpenWindow',0,[],[],32,2); % open a window with 32-bits
-screen('LoadNormalizedGammaTable',win,identityCLUT/255);
-screen('TextSize',win,24);
-screen('FillRect',win,transCLUT(backgroundEntry+1,:)); % fill the screen in mid-gray
-screen('Flip',win);
+win = Screen('OpenWindow',0,[],[],32,2); % open a window with 32-bits
+Screen('LoadNormalizedGammaTable',win,identityCLUT/255);
+Screen('TextSize',win,24);
+Screen('FillRect',win,transCLUT(backgroundEntry+1,:)); % fill the screen in mid-gray
+Screen('Flip',win);
 
 %%%% Prepare the stimuli, all done in contrast units
 c=1; % max. contrast for the gratings
@@ -103,42 +107,42 @@ img1 = LookupFromContrast(grating1,LBackground,transCLUT,BRcal);
 img2 = LookupFromContrast(grating2,LBackground,transCLUT,BRcal);
 
 %%%% Convert images into texture for rapid presentation
-tex(1) = screen('MakeTexture',win,img1);
-tex(2) = screen('MakeTexture',win,img2);
+tex(1) = Screen('MakeTexture',win,img1);
+tex(2) = Screen('MakeTexture',win,img2);
 
 %%%% Present the stimuli
-screen('DrawTexture',win,tex(1));
+Screen('DrawTexture',win,tex(1));
 % here is how text may be displayed at a specific luminance
-screen('DrawText',win,'A low-frequency sinewave grating. Press any key to continue.',0,26,squeeze(L2V(0.9,BRcal))');
-screen('Flip',win);
-waitsecs(0.2);
-kbWait;
+Screen('DrawText',win,'A low-frequency sinewave grating. Press any key to continue.',0,26,squeeze(L2V(0.9,BRcal))');
+Screen('Flip',win);
+WaitSecs(0.2);
+KbWait;
 
-screen('FillRect',win,transCLUT(backgroundEntry+1,:)); % erase the screen
-screen('DrawTexture',win,tex(2));
-screen('DrawText',win,'Same grate but shifted 180 deg.  Press any key to continue.',0,26,squeeze(L2V(0.9,BRcal))');
-screen('Flip',win);
-waitsecs(0.2);
-kbWait;
+Screen('FillRect',win,transCLUT(backgroundEntry+1,:)); % erase the screen
+Screen('DrawTexture',win,tex(2));
+Screen('DrawText',win,'Same grate but shifted 180 deg.  Press any key to continue.',0,26,squeeze(L2V(0.9,BRcal))');
+Screen('Flip',win);
+WaitSecs(0.2);
+KbWait;
 
-screen('FillRect',win,transCLUT(backgroundEntry+1,:)); % erase the screen
-screen('DrawText',win,'Counter-phased gratings on alternate frame.',0,26,squeeze(L2V(0.9,BRcal))');
-screen('DrawText',win,'Should see NOTHING in the middle if calibration is perfect.',0,52,squeeze(L2V(0.9,BRcal))');
-screen('DrawText',win,'Press any key to quit.',0,78,squeeze(L2V(0.9,BRcal))');
+Screen('FillRect',win,transCLUT(backgroundEntry+1,:)); % erase the screen
+Screen('DrawText',win,'Counter-phased gratings on alternate frame.',0,26,squeeze(L2V(0.9,BRcal))');
+Screen('DrawText',win,'Should see NOTHING in the middle if calibration is perfect.',0,52,squeeze(L2V(0.9,BRcal))');
+Screen('DrawText',win,'Press any key to quit.',0,78,squeeze(L2V(0.9,BRcal))');
 % here is how you flip rapidly between two frames
-waitsecs(0.2);
-flushevents('keyDown')
+WaitSecs(0.2);
+FlushEvents('keyDown')
 n = 0;
 kb = 0;
-screen('PreLoadTextures',win);
-priority(8);
+Screen('PreLoadTextures',win);
+Priority(8);
 while (~kb)
-    screen('DrawTexture',win,tex(n+1));
-    screen('Flip',win);
+    Screen('DrawTexture',win,tex(n+1));
+    Screen('Flip',win);
     n = rem(n+1,2);
-    kb = kbcheck;
+    kb = KbCheck;
 end
-priority(1);
+Priority(1);
 
 %%%% Done
-screen('closeall');
+Screen('closeall');

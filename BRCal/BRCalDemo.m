@@ -1,10 +1,14 @@
 % A demo code for using the "BRCal" gamma linearization routines with
 % much-larger-than-256-grey-level-per-image support
 %
-% Credits: The visual calibration routine "BRCalibrator.m" is from Dr. Zhong-Lin Lu
+% History: The visual calibration routine "BRCalibrator.m" is from Dr. Zhong-Lin Lu
 %          For the rest, blame Dr. Bosco Tjan (btjan@usc.edu), 10/2001
+% 11/15: BT changed 'screen' to 'Screen' to conform with Matlab 2013+
+
 
 clear all
+Screen('Preference', 'SkipSyncTests', 1);
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % add path if the this m-file is at the same level as the BRCal folder
@@ -83,13 +87,13 @@ end
 % All screen calls uses PsychoToolbox for OS X V1.0.6 (or above)
 
 %%%% Initialize a window
-win = screen('OpenWindow',0,[],[],32,2); % open a window with 32-bits
-screen('loadnormalizedgammatable',win,identityCLUT/255);		% straight-through clut
-screen('FillRect',win,transCLUT(backgroundEntry+1,:)); % fill the screen in mid-gray
-screen('Flip',win);
-screen('FillRect',win,transCLUT(backgroundEntry+1,:)); % fill the screen in mid-gray the other buffer
-screen('Flip',win);
-screen('TextSize',win,24);
+win = Screen('OpenWindow',0,[],[],32,2); % open a window with 32-bits
+Screen('loadnormalizedgammatable',win,identityCLUT/255);		% straight-through clut
+Screen('FillRect',win,transCLUT(backgroundEntry+1,:)); % fill the Screen in mid-gray
+Screen('Flip',win);
+Screen('FillRect',win,transCLUT(backgroundEntry+1,:)); % fill the screen in mid-gray the other buffer
+Screen('Flip',win);
+Screen('TextSize',win,24);
 
 %%%% Prepare the stimuli, all done in contrast units
 c=0.5; % max. contrast for the gratings
@@ -104,38 +108,38 @@ imgEven = LookupFromContrast(gratingEven,LBackground,transCLUT,BRcal);
 imgCombined = LookupFromContrast(gratingCombined,LBackground,transCLUT,BRcal);
 
 %%%% Present the stimuli
-imgOddx = screen('MakeTexture',win,imgOdd); % this replace the usage of OffScreenWindows
-screen('DrawTexture',win,imgOddx);
+imgOddx = Screen('MakeTexture',win,imgOdd); % this replace the usage of OffScreenWindows
+Screen('DrawTexture',win,imgOddx);
 % here is how text may be displayed at a specific luminance
-screen('DrawText',win,'A low-frequency sinewave grating.  Press any key to continue.',0,26,squeeze(L2V(0.9,BRcal))');
-screen('Flip',win);
-waitsecs(0.2);
-kbWait;
+Screen('DrawText',win,'A low-frequency sinewave grating.  Press any key to continue.',0,26,squeeze(L2V(0.9,BRcal))');
+Screen('Flip',win);
+WaitSecs(0.2);
+KbWait;
 
-screen('FillRect',win,transCLUT(backgroundEntry+1,:)); % erase the screen
-screen('PutImage',win,imgEven); % you can also use PutImage, but it's slower
-screen('DrawText',win,'Same grate but shifted 180 deg.  Press any key to continue.',0,26,squeeze(L2V(0.9,BRcal))');
-screen('Flip',win);
-waitsecs(0.2);
-kbWait;
+Screen('FillRect',win,transCLUT(backgroundEntry+1,:)); % erase the screen
+Screen('PutImage',win,imgEven); % you can also use PutImage, but it's slower
+Screen('DrawText',win,'Same grate but shifted 180 deg.  Press any key to continue.',0,26,squeeze(L2V(0.9,BRcal))');
+Screen('Flip',win);
+WaitSecs(0.2);
+KbWait;
 
-screen('FillRect',win,transCLUT(backgroundEntry+1,:)); % erase the screen
-screen('PutImage',win,imgCombined);
-screen('DrawText',win,'Counter-phased gratings on alternate scan line.',0,26,squeeze(L2V(0.9,BRcal))');
-screen('DrawText',win,'Should see NOTHING if calibration is perfect & inter-pixel dependence is absent.',0,52,squeeze(L2V(0.9,BRcal))');
-screen('DrawText',win,'Press any key to rotate the grating.',0,78,squeeze(L2V(0.9,BRcal))');
-screen('Flip',win);
-waitsecs(0.2);
-kbWait
+Screen('FillRect',win,transCLUT(backgroundEntry+1,:)); % erase the screen
+Screen('PutImage',win,imgCombined);
+Screen('DrawText',win,'Counter-phased gratings on alternate scan line.',0,26,squeeze(L2V(0.9,BRcal))');
+Screen('DrawText',win,'Should see NOTHING if calibration is perfect & inter-pixel dependence is absent.',0,52,squeeze(L2V(0.9,BRcal))');
+Screen('DrawText',win,'Press any key to rotate the grating.',0,78,squeeze(L2V(0.9,BRcal))');
+Screen('Flip',win);
+WaitSecs(0.2);
+KbWait
 
-screen('FillRect',win,transCLUT(backgroundEntry+1,:)); % erase the screen
-screen('PutImage',win, cat(3,imgCombined(:,:,1)',imgCombined(:,:,2)',imgCombined(:,:,3)'));
-screen('DrawText',win,'Counter-phased gratings on alternate scan line.',0,26,squeeze(L2V(0.9,BRcal))');
-screen('DrawText',win,'Should see NOTHING if calibration is perfect & inter-pixel dependence is absent.',0,52,squeeze(L2V(0.9,BRcal))');
-screen('DrawText',win,'Press any key to quit.',0,78,squeeze(L2V(0.9,BRcal))');
-screen('Flip',win);
-waitsecs(0.2);
-kbWait
+Screen('FillRect',win,transCLUT(backgroundEntry+1,:)); % erase the screen
+Screen('PutImage',win, cat(3,imgCombined(:,:,1)',imgCombined(:,:,2)',imgCombined(:,:,3)'));
+Screen('DrawText',win,'Counter-phased gratings on alternate scan line.',0,26,squeeze(L2V(0.9,BRcal))');
+Screen('DrawText',win,'Should see NOTHING if calibration is perfect & inter-pixel dependence is absent.',0,52,squeeze(L2V(0.9,BRcal))');
+Screen('DrawText',win,'Press any key to quit.',0,78,squeeze(L2V(0.9,BRcal))');
+Screen('Flip',win);
+WaitSecs(0.2);
+KbWait
 
 %%%% Done
-screen('CloseAll');
+Screen('CloseAll');

@@ -9,30 +9,30 @@ for i=1:length(target)
    end
 end
 targrect = [1 1 size(targ{1},2) size(targ{1},1)];
-targrect = centerrect(targrect,winrect);
+targrect = CenterRect(targrect,winrect);
 
 % initialize QUEST
 q=QuestCreate(expr.q0.guess,expr.q0.priorSd,expr.q0.pCorrect,expr.q0.beta,expr.q0.delta,expr.q0.gamma);
 
-waitsecs(0.2);
-flushevents('keyDown');
+WaitSecs(0.2);
+FlushEvents('keyDown');
 % fixation
-screen('fillrect',win,backgroundEntry);
-screen('drawtexture',win,fixtex);
+Screen('fillrect',win,backgroundEntry);
+Screen('drawtexture',win,fixtex);
 % provide instruction
-screen(win,'drawtext','Press "r" or "t" depending on the displayed letter.',5,30,0);
-screen(win,'drawtext','Press spacebar to continue.',5,60,0);
-screen(win,'drawtext','Press "q" to quit.',5,90,0);
-screen('flip',win);
-[keydown, ignore, keycode] = kbcheck;
+Screen(win,'drawtext','Press "r" or "t" depending on the displayed letter.',5,30,0);
+Screen(win,'drawtext','Press spacebar to continue.',5,60,0);
+Screen(win,'drawtext','Press "q" to quit.',5,90,0);
+Screen('flip',win);
+[keydown, ignore, keycode] = KbCheck;
 while ~keydown
-    [keydown, ignore, keycode] = kbcheck;
+    [keydown, ignore, keycode] = KbCheck;
 end
-if keycode(kbName('q'))
-   screen(win,'close'); showcursor
+if keycode(KbName('q'))
+   Screen(win,'close'); showcursor
    return % exit the program
 end
-flushevents('keydown');
+FlushEvents('keydown');
 
 for i=1:expr.ntrial
    % pick a target
@@ -48,7 +48,7 @@ for i=1:expr.ntrial
    % convert from contrast to a calibrated RGB image
    stim = LookupFromContrast(stim,LBackground,transCLUT,BRcal);
    % convert this to a texture
-   stmtex = screen('maketexture',win,stim);
+   stmtex = Screen('maketexture',win,stim);
    % present the stimulus and get the response
    play_a_trial;
    % determine if the response is correct

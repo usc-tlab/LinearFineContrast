@@ -24,19 +24,19 @@ backgroundEntry = transCLUT(backgroundEntry+1,:);
 expr.CMin = minLuminanceIncrement/LBackground; % minimum non-zero contrast
 
 % initialize screen
-[win winrect] = SCREEN(scr,'OpenWindow',[],[],32);
-framedur = screen('getflipinterval',win)
+[win winrect] = Screen(scr,'OpenWindow',[],[],32);
+framedur = Screen('getflipinterval',win)
 if useBRcal >= 1
     Screen('LoadNormalizedGammaTable', win, repmat(linspace(0,1,256)',[1,3]));
 end
 HideCursor;
-screen('FillRect',win,backgroundEntry);
-screen(win,'TextSize',24);
-screen('flip',win);
+Screen('FillRect',win,backgroundEntry);
+Screen(win,'TextSize',24);
+Screen('flip',win);
 
 % define a 'texture' for fixation
 fiximg = ones(3)*expr.fixcontrast; % contrast for fixation
 fiximg = LookupFromContrast(fiximg,LBackground,transCLUT,BRcal);
-fixtex = screen('maketexture',win,fiximg);
+fixtex = Screen('maketexture',win,fiximg);
 
 maxpriority = MaxPriority(win);

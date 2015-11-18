@@ -4,28 +4,28 @@
 
 Priority(1);
 
-flushevents('keydown');
-screen('fillrect',win,backgroundEntry);
-screen('drawtexture',win,fixtex);
-screen('flip',win);
-screen('fillrect',win,backgroundEntry)
-screen('drawtexture',win,stmtex);
-waitsecs(expr.soa/1000-framedur+0.001); %discount 1 frame since flip will be at the beginning of the next frame
-screen('flip',win);
-t0 = getsecs;
-screen('fillrect',win,backgroundEntry);
-screen('drawtexture',win,fixtex);
-waitsecs(expr.duration/1000-framedur+0.001); 
-screen('flip',win);
-t1 = getsecs;
+FlushEvents('keydown');
+Screen('fillrect',win,backgroundEntry);
+Screen('drawtexture',win,fixtex);
+Screen('flip',win);
+Screen('fillrect',win,backgroundEntry)
+Screen('drawtexture',win,stmtex);
+WaitSecs(expr.soa/1000-framedur+0.001); %discount 1 frame since flip will be at the beginning of the next frame
+Screen('flip',win);
+t0 = GetSecs;
+Screen('fillrect',win,backgroundEntry);
+Screen('drawtexture',win,fixtex);
+WaitSecs(expr.duration/1000-framedur+0.001); 
+Screen('flip',win);
+t1 = GetSecs;
 
 Priority(0);
 
-[keydown,s,keycode] = kbcheck;
-while ~keydown & getsecs-t0<10 % 10 sec max. response time
-   [keydown,s,keycode] = kbcheck;
+[keydown,s,keycode] = KbCheck;
+while ~keydown & GetSecs-t0<10 % 10 sec max. response time
+   [keydown,s,keycode] = KbCheck;
 end;
-flushevents('keydown');
+FlushEvents('keydown');
 
 % now do all the elevations
 % reaction time

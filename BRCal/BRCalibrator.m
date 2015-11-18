@@ -18,6 +18,11 @@ clear all
 %  9/08 BT: Minor changes: 1. leave the gamma table alone if running
 %           without attenuator (BRrotio <= 1). 2. slow down key checks for
 %           faster machines.
+%  11/15 BT:B/R ratio calibration appears broken since the OpenGL version.
+%  (grating too fine). Fixed.
+%  11/15 BT:Changed 'screen' to 'Screen' to conform with Matlab 2013+
+
+Screen('Preference', 'SkipSyncTests', 1);
 
 bg = [30 30 30]; % changed from 10 to 30
 
@@ -28,9 +33,9 @@ fprintf(fid, '\n%s\n',date);
 % ask a few questions before the command window becomes inaccessible (the
 % command would still be accessible in OS 9)
 whichScreen=str2num(input('Which Screen Are You Going to Calibrate (0, 1, 2)? ','s'));
-rect=CenterRect([0 0 192-1 192-1], SCREEN('Rect', whichScreen));		%frame size is 192*192
+rect=CenterRect([0 0 192-1 192-1], Screen('Rect', whichScreen));		%frame size is 192*192
 nframes=2;				%movie runs for 4*nframes, without repeats
-pixelSizes=SCREEN('PixelSizes',whichScreen);
+pixelSizes=Screen('PixelSizes',whichScreen);
 if max(pixelSizes)<24
     fprintf('Sorry, I need a screen that supports 24- or 32-bit pixelSize.\n');
     return;
@@ -43,34 +48,37 @@ else
     rrr=input('Please enter an initial red value (0-255): ');
 end
 
-[window,screenRect]=SCREEN('OpenWindow',whichScreen,0,[],max(pixelSizes),2); % force 24/32 bit, double buffered
+[window,screenRect]=Screen('OpenWindow',whichScreen,0,[],max(pixelSizes),2); % force 24/32 bit, double buffered
 
-savedClut=SCREEN('ReadNormalizedGammaTable',window); % the values are between 0 and 1
+savedClut=Screen('ReadNormalizedGammaTable',window); % the values are between 0 and 1
 if BRratio > 1 % use a identity gamma table with attenuator; use the built-in gamma table if no attenuator is used
     normalClut(:,:) = repmat(linspace(0,1,size(savedClut,1))',[1,3]); % linearize the gamma table
-    SCREEN('LoadNormalizedGammaTable',window,normalClut);
+    Screen('LoadNormalizedGammaTable',window,normalClut);
 end
 
-screen('textsize',window,18);
-screen('textcolor',window,127);
-SCREEN('FillRect', window, bg); % changed from 10 to 30 (BT)
-screen('flip',window);
-screen('fillrect', window, bg);
-screen('flip',window);
+Screen('textsize',window,18);
+Screen('textcolor',window,127);
+Screen('FillRect', window, bg); % changed from 10 to 30 (BT)
+Screen('flip',window);
+Screen('fillrect', window, bg);
+Screen('flip',window);
 
 lum = zeros([192 192 3]);
 
 if isempty(BRratio)
-    flushevents('keyDown');
+    FlushEvents('keyDown');
     %Determine BRratio by matching [rrr 0 195] with [0 0 200].
-    lum(1:2:end,:,1)=0;
-    lum(1:2:end,:,2)=0;
-    lum(1:2:end,:,3)=200;
-    lum(2:2:end,:,1)=0; %rrr
-    lum(2:2:end,:,2)=0;
-    lum(2:2:end,:,3)=195;
+    grating = zeros([12 12 3]);
+    grating(1:2:end,:,1)=0;
+    grating(1:2:end,:,2)=0;
+    grating(1:2:end,:,3)=200;
+    grating(2:2:end,:,1)=1; %rrr
+    grating(2:2:end,:,2)=0;
+    grating(2:2:end,:,3)=195;
+    lum = imresize(grating, size(lum,1)/size(grating,1), 'nearest');
+    idx = find(lum==1);
 
-    priority(maxpriority(window,'KbCheck'));
+    Priority(MaxPriority(window,'KbCheck'));
     while (1)
         if ( rrr > 255 )
             rrr = 255;
@@ -78,27 +86,27 @@ if isempty(BRratio)
             rrr = 0;
         end
         BRratio = rrr/5.0;
-        lum(2:2:end,:,1)=rrr;
-        screen('fillrect',window,bg);
+        lum(idx)=rrr;
+        Screen('fillrect',window,bg);
         msg = sprintf('"j" or "k" to null the grating, "q" when done.');
-        screen('drawtext',window,msg,0,0);
-        screen('putimage',window,lum);
-        screen('flip',window);
-        [kd,s,kc] = kbcheck;
+        Screen('drawtext',window,msg,0,0);
+        Screen('putimage',window,lum);
+        Screen('flip',window);
+        [kd,s,kc] = KbCheck;
         if kd
-            if kc(kbname('j'))
+            if kc(KbName('j'))
                 rrr=rrr+1;
-            elseif kc(kbname('k'))
+            elseif kc(KbName('k'))
                 rrr=rrr-1;
-            elseif kc(kbname('q'))
+            elseif kc(KbName('q'))
                 break;
-            elseif kc(kbname('escape'))
-                clear screen;
+            elseif kc(KbName('escape'))
+                clear Screen;
                 return
             end		%end if
         end		%end while
     end
-    priority(0);
+    Priority(0);
 end		% end if
 
 BRratio
@@ -112,8 +120,8 @@ M=zeros(15,3);
 %keyboard;
 %Fine luminance calibration:
 for i=1:15,
-    waitsecs(0.2);
-    flushevents('keyDown');
+    WaitSecs(0.2);
+    FlushEvents('keyDown');
     switch i
         case 1
             rgbH(1)=0; rgbH(2)=0; rgbH(3)=255;
@@ -182,8 +190,8 @@ for i=1:15,
     n=0;
     kb=1;
     ntexture=0;
-    slast = getsecs;
-    priority(maxpriority(window,'KbCheck'));
+    slast = GetSecs;
+    Priority(MaxPriority(window,'KbCheck'));
     while (1)
         msg2 = sprintf('"u" or "d" to null the grating; "j" or "k" to fine tune; "q" when done.\n');
 
@@ -203,17 +211,17 @@ for i=1:15,
             lum(64:128,:,1) = M(i,1);
             lum(64:128,:,2) = M(i,2);
             lum(64:128,:,3) = M(i,3);
-            tex(n+1)=SCREEN('maketexture',window,lum);
+            tex(n+1)=Screen('maketexture',window,lum);
             ntexture = ntexture+1;
         end
 
-        screen('fillrect',window,bg);
-        screen('drawtext',window,msg1,0,0);
-        screen('drawtext',window,msg2,0,20);
-        screen('drawtexture',window,tex(n+1));
-        screen('flip',window);
+        Screen('fillrect',window,bg);
+        Screen('drawtext',window,msg1,0,0);
+        Screen('drawtext',window,msg2,0,20);
+        Screen('drawtexture',window,tex(n+1));
+        Screen('flip',window);
         n = rem(n+1,2);
-        [kb,s,kc] = kbcheck;
+        [kb,s,kc] = KbCheck;
         if kb && (s-slast)<0.1
             kb = 0;
         elseif kb
@@ -221,32 +229,32 @@ for i=1:15,
         end
         if kb
             if ( BRratio <= 1 )
-                if kc(kbName('j')) || kc(kbName('u'))
+                if kc(KbName('j')) || kc(KbName('u'))
                     M(i,3)=M(i,3)+1;
-                elseif kc(kbName('k')) || kc(kbName('d'))
+                elseif kc(KbName('k')) || kc(KbName('d'))
                     M(i,3)=M(i,3)-1;
-                elseif kc(kbName('q'))
-                    screen('fillrect',window,bg);
-                    screen('flip',window);
+                elseif kc(KbName('q'))
+                    Screen('fillrect',window,bg);
+                    Screen('flip',window);
                     break;
                 end
                 M(i, 1) = M(i, 3);
                 M(i, 2) = M(i, 3);
             else
-                if kc(kbName('j'))
+                if kc(KbName('j'))
                     M(i,1)=M(i,1)+1;
-                elseif kc(kbName('u'))
+                elseif kc(KbName('u'))
                     M(i,3)=M(i,3)+1;
-                elseif kc(kbName('k'))
+                elseif kc(KbName('k'))
                     M(i,1)=M(i,1)-1;
-                elseif kc(kbName('d'))
+                elseif kc(KbName('d'))
                     M(i,3)=M(i,3)-1;
-                elseif kc(kbName('q'))
-                    screen('fillrect',window,bg);
-                    screen('flip',window);
+                elseif kc(KbName('q'))
+                    Screen('fillrect',window,bg);
+                    Screen('flip',window);
                     break;
-                elseif kc(kbName('escape'))
-                    clear screen
+                elseif kc(KbName('escape'))
+                    clear Screen
                     return;
                 end
             end
@@ -254,11 +262,11 @@ for i=1:15,
         M(i,M(i,:)<0) = 0;
         M(i,M(i,:)>255) = 255;
     end		%end while.
-    priority(0);
+    Priority(0);
     fprintf(fid,'%d %4.1f %4.1f %4.1f %4.1f %4.1f %4.1f %4.1f %4.1f %4.1f\n', i, rgbH(1), rgbH(2), rgbH(3), rgbL(1), rgbL(2), rgbL(3), M(i,1), M(i,2), M(i,3));
 end		%end for i= 1 to 15.
-screen('loadnormalizedgammatable',window,savedClut);
-SCREEN('CloseAll');
+Screen('loadnormalizedgammatable',window,savedClut);
+Screen('CloseAll');
 
 if ( BRratio <=1 )
     data=[

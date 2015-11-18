@@ -2,7 +2,7 @@
 % Bosco Tjan wrote it in 2003 for a matlab crash course
 % 9/2007 BT change it to run on the version of psychtoolbox that uses OpenGL
 %        This code has been tested on OS X.  Good luck with Windows!
-
+% 11/2015 BT made the code conforming to case-sensitive Matlab!
 
 %% BEGIN experimental parameters
 
@@ -18,7 +18,7 @@ expr.state = sum(100*clock);
 
 %info about stimuli
 expr.imagefile = {'s25-r','s25-t'};
-expr.imkey = [kbname('r') kbname('t')]; % these key codes are machine dependent
+expr.imkey = [KbName('r') KbName('t')]; % these key codes are machine dependent
 expr.imsize = [128 128];
 expr.duration = 250; % stimulus presentation time in ms
 expr.soa = 500; % time between response and onset of next trial ms
