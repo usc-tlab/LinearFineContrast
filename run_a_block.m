@@ -29,7 +29,7 @@ while ~keydown
     [keydown, ignore, keycode] = KbCheck;
 end
 if keycode(KbName('q'))
-   Screen(win,'close'); showcursor
+   Screen(win,'close'); ShowCursor
    return % exit the program
 end
 FlushEvents('keydown');
